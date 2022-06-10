@@ -5,7 +5,7 @@ metadata:
   namespace: default
   labels:
     app: falco
-    chart: "falco-1.18.5"
+    chart: "falco-1.19.1"
     release: "falco"
     heritage: "Helm"
 data:
@@ -25,10 +25,13 @@ data:
     rules_file:
       - /etc/falco/falco_rules.yaml
       - /etc/falco/falco_rules.local.yaml
-      - /etc/falco/k8s_audit_rules.yaml
       - /etc/falco/rules.d
 
     plugins:
+        - init_config: ""
+          library_path: libk8saudit.so
+          name: k8saudit
+          open_params: http://:9765/k8s-audit
         - init_config: ""
           library_path: libcloudtrail.so
           name: cloudtrail
@@ -44,6 +47,10 @@ data:
     # load_plugins: [cloudtrail, json]
     load_plugins:
         []
+    # Watch config file and rules files for modification.
+    # When a file is modified, Falco will propagate new config,
+    # by reloading itself.
+    watch_config_files: true
 
     # If true, the times displayed in log messages and output messages
     # will be in ISO 8601. By default, times are displayed in the local
@@ -195,10 +202,9 @@ data:
     webserver:
       enabled: true
       listen_port: 8765
-      k8s_audit_endpoint: /k8s-audit
       k8s_healthz_endpoint: /healthz
       ssl_enabled: false
-      ssl_certificate: /etc/falco/certs/server.pem
+      ssl_certificate: /etc/falco/certs/falco.pem
 
     # If keep_alive is set to true, the program will be started once and
     # continuously written to, with each output message on its own
@@ -447,7 +453,7 @@ data:
     #   condition: proc.name in (http_server_binaries) and inbound and fd.sport != 80 and fd.sport != 443
     #   output: "Inbound network traffic to HTTP Server on unexpected port (connection=%fd.name)"
     #   priority: WARNING
-  aws_cloudtrail_rules.yaml: |
+  aws_cloudtrail_rules.yaml: |+
     #
     # Copyright (C) 2022 The Falco Authors.
     #
@@ -465,11 +471,9 @@ data:
     # limitations under the License.
     #
   
-    # All rules files related to plugins should require engine version 10
+    # All rules files related to plugins should require at least engine version 10
     - required_engine_version: 10
   
-    # These rules can be read by cloudtrail plugin version 0.1.0, or
-    # anything semver-compatible.
     - required_plugin_versions:
       - name: cloudtrail
         version: 0.2.3
@@ -889,7 +893,8 @@ data:
         - aws
         - aws_cloudtrail
       source: aws_cloudtrail
-  falco_rules.local.yaml: |-
+  
+  falco_rules.local.yaml: |
     #
     # Copyright (C) 2019 The Falco Authors.
     #
@@ -920,7 +925,7 @@ data:
     #   tags: [users, container]
   
     # Or override/append to any rule, macro, or list from the Default Rules
-  falco_rules.yaml: |-
+  falco_rules.yaml: |
     #
     # Copyright (C) 2022 The Falco Authors.
     #
@@ -1366,6 +1371,9 @@ data:
     - list: shell_config_directories
       items: [/etc/zsh]
   
+    - macro: user_known_shell_config_modifiers
+      condition: (never_true)
+  
     - rule: Modify Shell Configuration File
       desc: Detect attempt to modify shell configuration files
       condition: >
@@ -1375,6 +1383,7 @@ data:
          fd.directory in (shell_config_directories))
         and not proc.name in (shell_binaries)
         and not exe_running_docker_save
+        and not user_known_shell_config_modifiers
       output: >
         a shell configuration file has been modified (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline pcmdline=%proc.pcmdline file=%fd.name container_id=%container.id image=%container.image.repository)
       priority:
@@ -2734,7 +2743,7 @@ data:
               registry.access.redhat.com/sematext/agent,
               registry.access.redhat.com/sematext/logagent]
   
-    # These container images are allowed to run with --privileged
+    # These container images are allowed to run with --privileged and full set of capabilities
     - list: falco_privileged_images
       items: [
         docker.io/calico/node,
@@ -2752,6 +2761,7 @@ data:
         gke.gcr.io/kube-proxy,
         gke.gcr.io/gke-metadata-server,
         gke.gcr.io/netd-amd64,
+        gke.gcr.io/watcher-daemonset,
         gcr.io/google-containers/prometheus-to-sd,
         k8s.gcr.io/ip-masq-agent-amd64,
         k8s.gcr.io/kube-proxy,
@@ -2820,6 +2830,31 @@ data:
       output: Privileged container started (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline %container.info image=%container.image.repository:%container.image.tag)
       priority: INFO
       tags: [container, cis, mitre_privilege_escalation, mitre_lateral_movement]
+  
+    # These capabilities were used in the past to escape from containers
+    - macro: excessively_capable_container
+      condition: >
+        (thread.cap_permitted contains CAP_SYS_ADMIN
+        or thread.cap_permitted contains CAP_SYS_MODULE
+        or thread.cap_permitted contains CAP_SYS_RAWIO
+        or thread.cap_permitted contains CAP_SYS_PTRACE
+        or thread.cap_permitted contains CAP_SYS_BOOT
+        or thread.cap_permitted contains CAP_SYSLOG
+        or thread.cap_permitted contains CAP_DAC_READ_SEARCH
+        or thread.cap_permitted contains CAP_NET_ADMIN
+        or thread.cap_permitted contains CAP_BPF)
+  
+    - rule: Launch Excessively Capable Container
+      desc: Detect container started with a powerful set of capabilities. Exceptions are made for known trusted images.
+      condition: >
+        container_started and container
+        and excessively_capable_container
+        and not falco_privileged_containers
+        and not user_privileged_containers
+      output: Excessively capable container started (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline %container.info image=%container.image.repository:%container.image.tag cap_permitted=%thread.cap_permitted)
+      priority: INFO
+      tags: [container, cis, mitre_privilege_escalation, mitre_lateral_movement]
+  
   
     # For now, only considering a full mount of /etc as
     # sensitive. Ideally, this would also consider all subdirectories
@@ -2957,7 +2992,8 @@ data:
         '"sh -c  -t -i"',
         '"sh -c openssl version"',
         '"bash -c id -Gn kafadmin"',
-        '"sh -c /bin/sh -c ''date +%%s''"'
+        '"sh -c /bin/sh -c ''date +%%s''"',
+        '"sh -c /usr/share/lighttpd/create-mime.conf.pl"'
         ]
   
     # This list allows for easy additions to the set of commands allowed
@@ -3487,26 +3523,28 @@ data:
         WARNING
       tags: [process, mitre_persistence]
   
+    # here `ash_history` will match both `bash_history` and `ash_history`
     - macro: modify_shell_history
       condition: >
         (modify and (
-          evt.arg.name contains "bash_history" or
+          evt.arg.name endswith "ash_history" or
           evt.arg.name endswith "zsh_history" or
           evt.arg.name contains "fish_read_history" or
           evt.arg.name endswith "fish_history" or
-          evt.arg.oldpath contains "bash_history" or
+          evt.arg.oldpath endswith "ash_history" or
           evt.arg.oldpath endswith "zsh_history" or
           evt.arg.oldpath contains "fish_read_history" or
           evt.arg.oldpath endswith "fish_history" or
-          evt.arg.path contains "bash_history" or
+          evt.arg.path endswith "ash_history" or
           evt.arg.path endswith "zsh_history" or
           evt.arg.path contains "fish_read_history" or
           evt.arg.path endswith "fish_history"))
   
+    # here `ash_history` will match both `bash_history` and `ash_history`
     - macro: truncate_shell_history
       condition: >
         (open_write and (
-          fd.name contains "bash_history" or
+          fd.name endswith "ash_history" or
           fd.name endswith "zsh_history" or
           fd.name contains "fish_read_history" or
           fd.name endswith "fish_history") and evt.arg.flags contains "O_TRUNC")
@@ -3729,11 +3767,10 @@ data:
       condition: (fd.sport in (miner_ports) and fd.sip.name in (miner_domains))
   
     - macro: net_miner_pool
-      condition: (evt.type in (sendto, sendmsg) and evt.dir=< and (fd.net != "127.0.0.0/8" and not fd.snet in (rfc_1918_addresses)) and ((minerpool_http) or (minerpool_https) or (minerpool_other)))
+      condition: (evt.type in (sendto, sendmsg, connect) and evt.dir=< and (fd.net != "127.0.0.0/8" and not fd.snet in (rfc_1918_addresses)) and ((minerpool_http) or (minerpool_https) or (minerpool_other)))
   
     - macro: trusted_images_query_miner_domain_dns
       condition: (container.image.repository in (docker.io/falcosecurity/falco, falcosecurity/falco, public.ecr.aws/falcosecurity/falco))
-      append: false
   
     # The rule is disabled by default.
     # Note: falco will send DNS request to resolve miner pool domain which may trigger alerts in your environment.
@@ -3984,6 +4021,9 @@ data:
     - macro: mount_info
       condition: (proc.args="" or proc.args intersects ("-V", "-l", "-h"))
   
+    - macro: user_known_mount_in_privileged_containers
+      condition: (never_true)
+  
     - rule: Mount Launched in Privileged Container
       desc: Detect file system mount happened inside a privileged container which might lead to container escape.
       condition: >
@@ -3991,6 +4031,7 @@ data:
         and container.privileged=true
         and proc.name=mount
         and not mount_info
+        and not user_known_mount_in_privileged_containers
       output: Mount was executed inside a privileged container (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline %container.info image=%container.image.repository:%container.image.tag)
       priority: WARNING
       tags: [container, cis, mitre_lateral_movement]
@@ -4026,10 +4067,7 @@ data:
   
     -  macro: curl_download
        condition: proc.name = curl and
-                  (proc.cmdline contains " > " or
-                  proc.cmdline contains " >> " or
-                  proc.cmdline contains " | " or
-                  proc.cmdline contains " -o " or
+                  (proc.cmdline contains " -o " or
                   proc.cmdline contains " --output " or
                   proc.cmdline contains " -O " or
                   proc.cmdline contains " --remote-name ")
@@ -4058,12 +4096,22 @@ data:
       priority: CRITICAL
       tags: [process, mitre_privilege_escalation]
   
+  
+    - rule: Detect release_agent File Container Escapes
+      desc: "This rule detect an attempt to exploit a container escape using release_agent file. By running a container with certains capabilities, a privileged user can modify release_agent file and escape from the container"
+      condition:
+        open_write and container and fd.name endswith release_agent and (user.uid=0 or thread.cap_effective contains CAP_DAC_OVERRIDE) and thread.cap_effective contains CAP_SYS_ADMIN
+      output:
+        "Detect an attempt to exploit a container escape using release_agent file (user=%user.name user_loginuid=%user.loginuid filename=%fd.name %container.info image=%container.image.repository:%container.image.tag cap_effective=%thread.cap_effective)"
+      priority: CRITICAL
+      tags: [container, mitre_privilege_escalation, mitre_lateral_movement]
+  
     # Application rules have moved to application_rules.yaml. Please look
     # there if you want to enable them by adding to
     # falco_rules.local.yaml.
   k8s_audit_rules.yaml: |
     #
-    # Copyright (C) 2019 The Falco Authors.
+    # Copyright (C) 2022 The Falco Authors.
     #
     #
     # Licensed under the Apache License, Version 2.0 (the "License");
@@ -4078,7 +4126,14 @@ data:
     # See the License for the specific language governing permissions and
     # limitations under the License.
     #
-    - required_engine_version: 2
+  
+    - required_engine_version: 12
+  
+    - required_plugin_versions:
+      - name: k8saudit
+        version: 0.1.0
+      - name: json
+        version: 0.3.0
   
     # Like always_true/always_false, but works with k8s audit events
     - macro: k8s_audit_always_true
@@ -4115,13 +4170,24 @@ data:
         cluster-autoscaler,
         "system:addon-manager",
         "cloud-controller-manager",
-        "eks:node-manager",
         "system:kube-controller-manager"
         ]
   
+    - list: eks_allowed_k8s_users
+      items: [
+        "eks:node-manager",
+        "eks:certificate-controller",
+        "eks:fargate-scheduler",
+        "eks:k8s-metrics",
+        "eks:authenticator",
+        "eks:cluster-event-watcher",
+        "eks:nodewatcher",
+        "eks:pod-identity-mutating-webhook"
+        ]
+    -
     - rule: Disallowed K8s User
       desc: Detect any k8s operation by users outside of an allowed set of users.
-      condition: kevt and non_system_user and not ka.user.name in (allowed_k8s_users)
+      condition: kevt and non_system_user and not ka.user.name in (allowed_k8s_users) and not ka.user.name in (eks_allowed_k8s_users)
       output: K8s Operation performed by user not in allowed list of users (user=%ka.user.name target=%ka.target.name/%ka.target.resource verb=%ka.verb uri=%ka.uri resp=%ka.response.code)
       priority: WARNING
       source: k8s_audit
@@ -4138,6 +4204,9 @@ data:
   
     - macro: response_successful
       condition: (ka.response.code startswith 2)
+  
+    - macro: kget
+      condition: ka.verb=get
   
     - macro: kcreate
       condition: ka.verb=create
@@ -4183,6 +4252,12 @@ data:
   
     - macro: health_endpoint
       condition: ka.uri=/healthz
+  
+    - macro: live_endpoint
+      condition: ka.uri=/livez
+  
+    - macro: ready_endpoint
+      condition: ka.uri=/readyz
   
     - rule: Create Disallowed Pod
       desc: >
@@ -4238,6 +4313,28 @@ data:
       source: k8s_audit
       tags: [k8s]
   
+    - list: falco_hostpid_images
+      items: []
+  
+    - rule: Create HostPid Pod
+      desc: Detect an attempt to start a pod using the host pid namespace.
+      condition: kevt and pod and kcreate and ka.req.pod.host_pid intersects (true) and not ka.req.pod.containers.image.repository in (falco_hostpid_images)
+      output: Pod started using host pid namespace (user=%ka.user.name pod=%ka.resp.name ns=%ka.target.namespace images=%ka.req.pod.containers.image)
+      priority: WARNING
+      source: k8s_audit
+      tags: [k8s]
+  
+    - list: falco_hostipc_images
+      items: []
+  
+    - rule: Create HostIPC Pod
+      desc: Detect an attempt to start a pod using the host ipc namespace.
+      condition: kevt and pod and kcreate and ka.req.pod.host_ipc intersects (true) and not ka.req.pod.containers.image.repository in (falco_hostipc_images)
+      output: Pod started using host ipc namespace (user=%ka.user.name pod=%ka.resp.name ns=%ka.target.namespace images=%ka.req.pod.containers.image)
+      priority: WARNING
+      source: k8s_audit
+      tags: [k8s]
+  
     - macro: user_known_node_port_service
       condition: (k8s_audit_never_true)
   
@@ -4272,7 +4369,7 @@ data:
     - rule: Anonymous Request Allowed
       desc: >
         Detect any request made by the anonymous user that was allowed
-      condition: kevt and ka.user.name=system:anonymous and ka.auth.decision="allow" and not health_endpoint
+      condition: kevt and ka.user.name=system:anonymous and ka.auth.decision="allow" and not health_endpoint and not live_endpoint and not ready_endpoint
       output: Request by anonymous user allowed (user=%ka.user.name verb=%ka.verb uri=%ka.uri reason=%ka.auth.reason))
       priority: WARNING
       source: k8s_audit
@@ -4352,7 +4449,8 @@ data:
         k8s.gcr.io/kube-apiserver,
         gke.gcr.io/kube-proxy,
         gke.gcr.io/netd-amd64,
-        k8s.gcr.io/addon-resizer,
+        gke.gcr.io/watcher-daemonset,
+        k8s.gcr.io/addon-resizer
         k8s.gcr.io/prometheus-to-sd,
         k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64,
         k8s.gcr.io/k8s-dns-kube-dns-amd64,
@@ -4543,7 +4641,7 @@ data:
     - rule: K8s Serviceaccount Created
       desc: Detect any attempt to create a service account
       condition: (kactivity and kcreate and serviceaccount and response_successful)
-      output: K8s Serviceaccount Created (user=%ka.user.name user=%ka.target.name ns=%ka.target.namespace resp=%ka.response.code decision=%ka.auth.decision reason=%ka.auth.reason)
+      output: K8s Serviceaccount Created (user=%ka.user.name serviceaccount=%ka.target.name ns=%ka.target.namespace resp=%ka.response.code decision=%ka.auth.decision reason=%ka.auth.reason)
       priority: INFO
       source: k8s_audit
       tags: [k8s]
@@ -4551,7 +4649,7 @@ data:
     - rule: K8s Serviceaccount Deleted
       desc: Detect any attempt to delete a service account
       condition: (kactivity and kdelete and serviceaccount and response_successful)
-      output: K8s Serviceaccount Deleted (user=%ka.user.name user=%ka.target.name ns=%ka.target.namespace resp=%ka.response.code decision=%ka.auth.decision reason=%ka.auth.reason)
+      output: K8s Serviceaccount Deleted (user=%ka.user.name serviceaccount=%ka.target.name ns=%ka.target.namespace resp=%ka.response.code decision=%ka.auth.decision reason=%ka.auth.reason)
       priority: INFO
       source: k8s_audit
       tags: [k8s]
@@ -4597,10 +4695,34 @@ data:
       tags: [k8s]
   
     - rule: K8s Secret Deleted
-      desc: Detect any attempt to delete a secret Service account tokens are excluded.
+      desc: Detect any attempt to delete a secret. Service account tokens are excluded.
       condition: (kactivity and kdelete and secret and ka.target.namespace!=kube-system and non_system_user and response_successful)
       output: K8s Secret Deleted (user=%ka.user.name secret=%ka.target.name ns=%ka.target.namespace resp=%ka.response.code decision=%ka.auth.decision reason=%ka.auth.reason)
       priority: INFO
+      source: k8s_audit
+      tags: [k8s]
+  
+    - rule: K8s Secret Get Successfully
+      desc: >
+        Detect any attempt to get a secret. Service account tokens are excluded.
+      condition: >
+        secret and kget
+        and kactivity
+        and response_successful
+      output: K8s Secret Get Successfully (user=%ka.user.name secret=%ka.target.name ns=%ka.target.namespace resp=%ka.response.code decision=%ka.auth.decision reason=%ka.auth.reason)
+      priority: ERROR
+      source: k8s_audit
+      tags: [k8s]
+  
+    - rule:  K8s Secret Get Unsuccessfully Tried
+      desc: >
+        Detect an unsuccessful attempt to get the secret. Service account tokens are excluded.
+      condition: >
+        secret and kget
+        and kactivity
+        and not response_successful
+      output: K8s Secret Get Unsuccessfully Tried (user=%ka.user.name secret=%ka.target.name ns=%ka.target.namespace resp=%ka.response.code decision=%ka.auth.decision reason=%ka.auth.reason)
+      priority: WARNING
       source: k8s_audit
       tags: [k8s]
   
