@@ -1,7 +1,5 @@
 # Kubernetes Deployment Files
 
-Status: **Under development**
-
 This GitHub project contains some examples of Kubernetes manifest files to help you deploying Falco.
 
 These resource definitions are automatically generated from the Helm chart located at the [charts repo](https://github.com/falcosecurity/charts) and it is strongly recommended that they are considered as templates, not as final resources to deploy Falco.
