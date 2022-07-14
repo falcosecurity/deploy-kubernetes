@@ -2,11 +2,13 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: falco
+  namespace: default
   labels:
-    app: falco
-    chart: "falco-1.19.4"
-    release: "falco"
-    heritage: "Helm"
+    helm.sh/chart: falco-2.0.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.32.1"
+    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - extensions
