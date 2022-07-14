@@ -4,25 +4,26 @@ metadata:
   name: falco
   namespace: default
   labels:
-    app: falco
-    chart: "falco-1.19.4"
-    release: "falco"
-    heritage: "Helm"
+    helm.sh/chart: falco-2.0.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.32.1"
+    app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:
-      app: falco
-      role: security
+      app.kubernetes.io/name: falco
+      app.kubernetes.io/instance: falco
   template:
     metadata:
       name: falco
       labels:
-        app: falco
-        role: security
+        app.kubernetes.io/name: falco
+        app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 0e63b754410d166b69329c33052d0df64e31c4e6e560377cb55b5bd01a1c40ef
-        checksum/rules: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/certs: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/config: 97dec775f6fd9ee181ab24157356761d0eff923eb9ce12b2b5e89ecd056e5c5c
+        checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
       serviceAccountName: falco
       tolerations:
@@ -30,7 +31,7 @@ spec:
           key: node-role.kubernetes.io/master
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco:0.32.0
+          image: docker.io/falcosecurity/falco-no-driver:0.32.1
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -59,6 +60,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: SKIP_DRIVER_LOADER
+              value:
           livenessProbe:
             initialDelaySeconds: 60
             timeoutSeconds: 5
@@ -74,15 +77,31 @@ spec:
               path: /healthz
               port: 8765
           volumeMounts:
+            - mountPath: /root/.falco
+              name: root-falco-fs
+            - mountPath: /host/proc
+              name: proc-fs
+            - mountPath: /host/dev
+              name: dev-fs
+              readOnly: true
             - mountPath: /host/var/run/docker.sock
               name: docker-socket
             - mountPath: /host/run/containerd/containerd.sock
               name: containerd-socket
             - mountPath: /host/run/crio/crio.sock
               name: crio-socket
-            - mountPath: /host/dev
-              name: dev-fs
-              readOnly: true
+            - mountPath: /etc/falco
+              name: config-volume
+            
+      initContainers:
+        - name: falco-driver-loader
+          image: docker.io/falcosecurity/falco-driver-loader:0.32.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /root/.falco
+              name: root-falco-fs
             - mountPath: /host/proc
               name: proc-fs
               readOnly: true
@@ -97,24 +116,10 @@ spec:
             - mountPath: /host/etc
               name: etc-fs
               readOnly: true
-            - mountPath: /etc/falco
-              name: config-volume
+          env:
       volumes:
-        - name: docker-socket
-          hostPath:
-            path: /var/run/docker.sock
-        - name: containerd-socket
-          hostPath:
-            path: /run/containerd/containerd.sock
-        - name: crio-socket
-          hostPath:
-            path: /run/crio/crio.sock
-        - name: dev-fs
-          hostPath:
-            path: /dev
-        - name: proc-fs
-          hostPath:
-            path: /proc
+        - name: root-falco-fs
+          emptyDir: {}  
         - name: boot-fs
           hostPath:
             path: /boot
@@ -127,6 +132,21 @@ spec:
         - name: etc-fs
           hostPath:
             path: /etc
+        - name: dev-fs
+          hostPath:
+            path: /dev
+        - name: docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+        - name: containerd-socket
+          hostPath:
+            path: /run/containerd/containerd.sock
+        - name: crio-socket
+          hostPath:
+            path: /run/crio/crio.sock
+        - name: proc-fs
+          hostPath:
+            path: /proc
         - name: config-volume
           configMap:
             name: falco
@@ -143,5 +163,6 @@ spec:
                 path: k8s_audit_rules.yaml
               - key: aws_cloudtrail_rules.yaml
                 path: aws_cloudtrail_rules.yaml
+        
   updateStrategy:
     type: RollingUpdate
