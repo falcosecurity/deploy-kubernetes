@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: event-generator
   labels:
-    helm.sh/chart: event-generator-0.1.0
+    helm.sh/chart: event-generator-0.1.1
     app.kubernetes.io/name: "event-generator"
     app.kubernetes.io/instance: "event-generator"
     app.kubernetes.io/part-of: "event-generator"
