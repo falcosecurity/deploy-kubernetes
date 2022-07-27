@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-2.0.5
+    helm.sh/chart: falco-2.0.6
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.32.1"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 211b8be12c57abc040dfc3652ebc7a2a4d7e06d02973f40b9239c2b9f0035a6a
+        checksum/config: 49b73f75cd633eac045a7850347e48265c1db8ab4f0860611d8a3a5f16062c3c
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -62,6 +62,7 @@ spec:
                   fieldPath: spec.nodeName
             - name: SKIP_DRIVER_LOADER
               value:
+          tty: false
           livenessProbe:
             initialDelaySeconds: 60
             timeoutSeconds: 5
