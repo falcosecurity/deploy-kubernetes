@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-2.0.18
+    helm.sh/chart: falco-2.1.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.32.2"
+    app.kubernetes.io/version: "0.33.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: bc354200be4e97605c3946e77ca300f78dbd96491068c309696eb18efc50ec17
+        checksum/config: 4338e0cf01295398067ba038e6775491eb87cdc217e4684a9fa85c34d742c792
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -31,7 +31,7 @@ spec:
           key: node-role.kubernetes.io/master
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco-no-driver:0.32.2
+          image: docker.io/falcosecurity/falco-no-driver:0.33.0
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -43,7 +43,7 @@ spec:
           securityContext:
             privileged: true
           args:
-            - /usr/bin/falco
+            - /usr/bin/falco        
             - --cri
             - /run/containerd/containerd.sock
             - --cri
@@ -85,6 +85,8 @@ spec:
             - mountPath: /host/dev
               name: dev-fs
               readOnly: true
+            - name: sys-fs
+              mountPath: /sys/module/falco
             - mountPath: /host/var/run/docker.sock
               name: docker-socket
             - mountPath: /host/run/containerd/containerd.sock
@@ -96,7 +98,7 @@ spec:
             
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.32.2
+          image: docker.io/falcosecurity/falco-driver-loader:0.33.0
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
@@ -136,6 +138,9 @@ spec:
         - name: dev-fs
           hostPath:
             path: /dev
+        - name: sys-fs
+          hostPath:
+            path: /sys/module/falco
         - name: docker-socket
           hostPath:
             path: /var/run/docker.sock
