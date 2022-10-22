@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-2.1.0
+    helm.sh/chart: falco-2.2.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.33.0"
@@ -17,7 +17,7 @@ data:
       filename: ./events.txt
       keep_alive: false
     grpc:
-      bind_address: unix:///var/run/falco/falco.sock
+      bind_address: unix:///run/falco/falco.sock
       enabled: false
       threadiness: 0
     grpc_output:
