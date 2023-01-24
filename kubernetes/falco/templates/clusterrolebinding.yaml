@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: falco
   labels:
-    helm.sh/chart: falco-2.4.6
+    helm.sh/chart: falco-2.5.1
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.33.1"
