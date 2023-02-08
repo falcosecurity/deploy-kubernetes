@@ -5,4 +5,5 @@ resources:
 - templates/clusterrolebinding.yaml
 - templates/configmap.yaml
 - templates/daemonset.yaml
+- templates/falcoctl-configmap.yaml
 - templates/serviceaccount.yaml
