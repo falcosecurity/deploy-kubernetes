@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-2.5.5
+    helm.sh/chart: falco-3.0.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.33.1"
+    app.kubernetes.io/version: "0.34.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 100d2e221e5f8de369862eee87c28738c07e3672d00cb9729fcb81448bd68110
+        checksum/config: f7c27bb2e64386c78edbf84b643f45e2d3c2c09e670dd79bc70890e77328a54b
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -33,7 +33,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco-no-driver:0.33.1
+          image: docker.io/falcosecurity/falco-no-driver:0.34.0
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -62,8 +62,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-            - name: SKIP_DRIVER_LOADER
-              value:
           tty: false
           livenessProbe:
             initialDelaySeconds: 60
@@ -80,6 +78,8 @@ spec:
               path: /healthz
               port: 8765
           volumeMounts:
+            - mountPath: /etc/falco
+              name: rulesfiles-install-dir
             - mountPath: /root/.falco
               name: root-falco-fs
             - mountPath: /host/proc
@@ -95,12 +95,29 @@ spec:
               name: containerd-socket
             - mountPath: /host/run/crio/crio.sock
               name: crio-socket
-            - mountPath: /etc/falco
-              name: config-volume
+            - mountPath: /etc/falco/falco.yaml
+              name: falco-yaml
+              subPath: falco.yaml
             
+        - name: falcoctl-artifact-follow
+          image: docker.io/falcosecurity/falcoctl:0.4.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - artifact
+            - follow
+            - --verbose
+          securityContext:
+          volumeMounts:
+            - mountPath: /plugins
+              name: plugins-install-dir
+            - mountPath: /rulesfiles
+              name: rulesfiles-install-dir
+            - mountPath: /etc/falcoctl
+              name: falcoctl-config-volume
+          env:
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.33.1
+          image: docker.io/falcosecurity/falco-driver-loader:0.34.0
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
@@ -122,7 +139,27 @@ spec:
               name: etc-fs
               readOnly: true
           env:
+        - name: falcoctl-artifact-install
+          image: docker.io/falcosecurity/falcoctl:0.4.0
+          imagePullPolicy: IfNotPresent
+          args: 
+            - artifact
+            - install
+            - --verbose
+          securityContext:
+          volumeMounts:
+            - mountPath: /plugins
+              name: plugins-install-dir
+            - mountPath: /rulesfiles
+              name: rulesfiles-install-dir
+            - mountPath: /etc/falcoctl
+              name: falcoctl-config-volume
+          env:
       volumes:
+        - name: plugins-install-dir
+          emptyDir: {}
+        - name: rulesfiles-install-dir
+          emptyDir: {}
         - name: root-falco-fs
           emptyDir: {}  
         - name: boot-fs
@@ -155,22 +192,18 @@ spec:
         - name: proc-fs
           hostPath:
             path: /proc
-        - name: config-volume
+        - name: falcoctl-config-volume
+          configMap: 
+            name: falco-falcoctl
+            items:
+              - key: falcoctl.yaml
+                path: falcoctl.yaml
+        - name: falco-yaml
           configMap:
             name: falco
             items:
-              - key: falco.yaml
-                path: falco.yaml
-              - key: falco_rules.yaml
-                path: falco_rules.yaml
-              - key: falco_rules.local.yaml
-                path: falco_rules.local.yaml
-              - key: application_rules.yaml
-                path: rules.available/application_rules.yaml
-              - key: k8s_audit_rules.yaml
-                path: k8s_audit_rules.yaml
-              - key: aws_cloudtrail_rules.yaml
-                path: aws_cloudtrail_rules.yaml
+            - key: falco.yaml
+              path: falco.yaml
         
   updateStrategy:
     type: RollingUpdate
