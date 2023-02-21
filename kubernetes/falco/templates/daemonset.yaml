@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.0.0
+    helm.sh/chart: falco-3.1.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.34.0"
+    app.kubernetes.io/version: "0.34.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: f7c27bb2e64386c78edbf84b643f45e2d3c2c09e670dd79bc70890e77328a54b
+        checksum/config: af5f738a10f0db7a54613b6fb8e4d712689db86de9b45ec8d751d5f3248c9ca2
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -33,7 +33,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco-no-driver:0.34.0
+          image: docker.io/falcosecurity/falco-no-driver:0.34.1
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -117,7 +117,7 @@ spec:
           env:
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.34.0
+          image: docker.io/falcosecurity/falco-driver-loader:0.34.1
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
