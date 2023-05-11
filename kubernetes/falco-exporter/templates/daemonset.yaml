@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/instance: falco-exporter
     app.kubernetes.io/version: "0.8.2"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: falco-exporter-0.9.4
+    helm.sh/chart: falco-exporter-0.9.5
   namespace: default
 spec:
   selector:
@@ -28,7 +28,14 @@ spec:
       containers:
         - name: falco-exporter
           securityContext:
-            {}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           image: "docker.io/falcosecurity/falco-exporter:0.8.2"
           imagePullPolicy: IfNotPresent
           args:
