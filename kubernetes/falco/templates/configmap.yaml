@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.2.0
+    helm.sh/chart: falco-3.2.1
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.35.0"
@@ -31,7 +31,7 @@ data:
       ca_path: /etc/ssl/certs
       enabled: false
       insecure: false
-      url: http://some.url
+      url: ""
       user_agent: falcosecurity/falco
     json_include_output_property: true
     json_include_tags_property: true
