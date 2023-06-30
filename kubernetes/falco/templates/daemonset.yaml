@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.2.1
+    helm.sh/chart: falco-3.3.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.35.0"
+    app.kubernetes.io/version: "0.35.1"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: fc899822e27efe132ed66b4d5bd4cd6c5e8e6d316a0174dd55deebf1b13164fc
+        checksum/config: ababd52e0d3f529b6a019cbe3f001e6f94ff4bd8a69829385ae08cb28f4bf230
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -33,7 +33,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco-no-driver:0.35.0
+          image: docker.io/falcosecurity/falco-no-driver:0.35.1
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -100,7 +100,7 @@ spec:
               subPath: falco.yaml
             
         - name: falcoctl-artifact-follow
-          image: docker.io/falcosecurity/falcoctl:0.5.0
+          image: docker.io/falcosecurity/falcoctl:0.5.1
           imagePullPolicy: IfNotPresent
           args:
             - artifact
@@ -117,7 +117,7 @@ spec:
           env:
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.35.0
+          image: docker.io/falcosecurity/falco-driver-loader:0.35.1
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
@@ -140,7 +140,7 @@ spec:
               readOnly: true
           env:
         - name: falcoctl-artifact-install
-          image: docker.io/falcosecurity/falcoctl:0.5.0
+          image: docker.io/falcosecurity/falcoctl:0.5.1
           imagePullPolicy: IfNotPresent
           args: 
             - artifact
