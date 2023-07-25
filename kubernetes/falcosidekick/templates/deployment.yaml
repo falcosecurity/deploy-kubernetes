@@ -5,7 +5,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: falcosidekick
-    helm.sh/chart: falcosidekick-0.6.1
+    helm.sh/chart: falcosidekick-0.6.2
     app.kubernetes.io/instance: falcosidekick
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -20,7 +20,7 @@ spec:
         app.kubernetes.io/name: falcosidekick
         app.kubernetes.io/instance: falcosidekick
       annotations:
-        checksum/config: b8bd2890f13a6818904c0613048e44d72742febf1392636306baa292f22f10e6
+        checksum/config: f4885e7d1dd708284fb1a44c0aa2434ee7c6ebc5847e9aa42258c5a8bc927b03
     spec:
       serviceAccountName: falcosidekick
       securityContext:
