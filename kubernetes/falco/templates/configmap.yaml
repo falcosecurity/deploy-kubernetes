@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.5.0
+    helm.sh/chart: falco-3.6.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.35.1"
@@ -59,6 +59,9 @@ data:
     modern_bpf:
       cpus_for_each_syscall_buffer: 2
     output_timeout: 2000
+    outputs:
+      max_burst: 1000
+      rate: 0
     plugins:
     - init_config: null
       library_path: libk8saudit.so
