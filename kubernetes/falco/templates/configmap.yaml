@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.6.2
+    helm.sh/chart: falco-3.7.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.35.1"
+    app.kubernetes.io/version: "0.36.0"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
@@ -29,8 +29,12 @@ data:
       ca_bundle: ""
       ca_cert: ""
       ca_path: /etc/ssl/certs
+      client_cert: /etc/ssl/certs/client.crt
+      client_key: /etc/ssl/certs/client.key
+      echo: false
       enabled: false
       insecure: false
+      mtls: false
       url: ""
       user_agent: falcosecurity/falco
     json_include_output_property: true
@@ -62,6 +66,9 @@ data:
     outputs:
       max_burst: 1000
       rate: 0
+    outputs_queue:
+      capacity: 0
+      recovery: exit
     plugins:
     - init_config: null
       library_path: libk8saudit.so
@@ -77,6 +84,7 @@ data:
       enabled: false
       keep_alive: false
       program: 'jq ''{text: .output}'' | curl -d @- -X POST https://hooks.slack.com/services/XXX'
+    rule_matching: first
     rules_file:
     - /etc/falco/falco_rules.yaml
     - /etc/falco/falco_rules.local.yaml
