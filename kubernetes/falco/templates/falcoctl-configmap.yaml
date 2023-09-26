@@ -4,10 +4,10 @@ metadata:
   name: falco-falcoctl
   namespace: default
   labels:
-    helm.sh/chart: falco-3.6.2
+    helm.sh/chart: falco-3.7.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.35.1"
+    app.kubernetes.io/version: "0.36.0"
     app.kubernetes.io/managed-by: Helm
 data:
   falcoctl.yaml: |-
@@ -19,12 +19,12 @@ data:
         falcoversions: http://localhost:8765/versions
         pluginsDir: /plugins
         refs:
-        - falco-rules:1
+        - falco-rules:2
         rulesfilesDir: /rulesfiles
       install:
         pluginsDir: /plugins
         refs:
-        - falco-rules:1
+        - falco-rules:2
         resolveDeps: false
         rulesfilesDir: /rulesfiles
     indexes:
