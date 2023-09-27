@@ -4,6 +4,7 @@ resources:
 - templates/deployment.yaml
 - templates/rbac-ui.yaml
 - templates/rbac.yaml
+- templates/secrets-ui.yaml
 - templates/secrets.yaml
 - templates/service.yaml
 - templates/tests/test-connection.yaml
