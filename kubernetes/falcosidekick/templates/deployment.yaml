@@ -5,7 +5,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: falcosidekick
-    helm.sh/chart: falcosidekick-0.7.2
+    helm.sh/chart: falcosidekick-0.7.3
     app.kubernetes.io/instance: falcosidekick
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -20,7 +20,7 @@ spec:
         app.kubernetes.io/name: falcosidekick
         app.kubernetes.io/instance: falcosidekick
       annotations:
-        checksum/config: 5ba2206a9cb5b186bd02d7c8540d70a9af9115f4f8ed803da1492acd1ea4d6a9
+        checksum/config: fc1a98d09f746dfdb4ce52a189341e08848f263f1aac7216945650f797748632
     spec:
       serviceAccountName: falcosidekick
       securityContext:
@@ -79,6 +79,6 @@ spec:
             - name: TLSSERVER_NOTLSPORT
               value: "2810"
             - name: TLSSERVER_NOTLSPATHS
-              value: ""
+              value: "/ping"
           resources:
             {}

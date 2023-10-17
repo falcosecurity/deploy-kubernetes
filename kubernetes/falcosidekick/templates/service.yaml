@@ -5,7 +5,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: falcosidekick
-    helm.sh/chart: falcosidekick-0.7.2
+    helm.sh/chart: falcosidekick-0.7.3
     app.kubernetes.io/instance: falcosidekick
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -15,6 +15,11 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: 2810
+      targetPort: http-notls
+      protocol: TCP
+      name: http-notls
+
   selector:
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
