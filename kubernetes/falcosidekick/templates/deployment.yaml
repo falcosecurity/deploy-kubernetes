@@ -5,7 +5,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: falcosidekick
-    helm.sh/chart: falcosidekick-0.7.3
+    helm.sh/chart: falcosidekick-0.7.8
     app.kubernetes.io/instance: falcosidekick
     app.kubernetes.io/managed-by: Helm
 spec:
@@ -20,7 +20,7 @@ spec:
         app.kubernetes.io/name: falcosidekick
         app.kubernetes.io/instance: falcosidekick
       annotations:
-        checksum/config: fc1a98d09f746dfdb4ce52a189341e08848f263f1aac7216945650f797748632
+        checksum/config: 052f98cdd848c2b232ebe1e2f6aadc360070027942fbbee98f18e7d5f145f756
     spec:
       serviceAccountName: falcosidekick
       securityContext:
@@ -66,19 +66,5 @@ spec:
               value: ""
             - name: MUTUALTLSCLIENT_CACERTFILE
               value: ""
-            - name: TLSSERVER_DEPLOY
-              value: "false"
-            - name: TLSSERVER_CERTFILE
-              value: "/etc/certs/server/server.crt"
-            - name: TLSSERVER_KEYFILE
-              value: "/etc/certs/server/server.key"
-            - name: TLSSERVER_CACERTFILE
-              value: "/etc/certs/server/ca.crt"
-            - name: TLSSERVER_MUTUALTLS
-              value: "false"
-            - name: TLSSERVER_NOTLSPORT
-              value: "2810"
-            - name: TLSSERVER_NOTLSPATHS
-              value: "/ping"
           resources:
             {}
