@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.8.4
+    helm.sh/chart: falco-3.8.5
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.36.2"
@@ -28,9 +28,9 @@ data:
     http_output:
       ca_bundle: ""
       ca_cert: ""
-      ca_path: /etc/ssl/certs
-      client_cert: /etc/ssl/certs/client.crt
-      client_key: /etc/ssl/certs/client.key
+      ca_path: /etc/falco/certs/
+      client_cert: /etc/falco/certs/client/client.crt
+      client_key: /etc/falco/certs/client/client.key
       echo: false
       enabled: false
       insecure: false
