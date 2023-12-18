@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: event-generator
   labels:
-    helm.sh/chart: event-generator-0.3.1
+    helm.sh/chart: event-generator-0.3.2
     app.kubernetes.io/name: "event-generator"
     app.kubernetes.io/instance: "event-generator"
     app.kubernetes.io/part-of: "event-generator"
@@ -15,7 +15,7 @@ kind: ClusterRole
 metadata:
   name: event-generator
   labels:
-    helm.sh/chart: event-generator-0.3.1
+    helm.sh/chart: event-generator-0.3.2
     app.kubernetes.io/name: "event-generator"
     app.kubernetes.io/instance: "event-generator"
     app.kubernetes.io/part-of: "event-generator"
@@ -72,7 +72,7 @@ kind: RoleBinding
 metadata:
   name: event-generator
   labels:
-    helm.sh/chart: event-generator-0.3.1
+    helm.sh/chart: event-generator-0.3.2
     app.kubernetes.io/name: "event-generator"
     app.kubernetes.io/instance: "event-generator"
     app.kubernetes.io/part-of: "event-generator"
