@@ -4,10 +4,13 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
+    helm.sh/chart: falcosidekick-0.7.11
     app.kubernetes.io/name: falcosidekick
-    helm.sh/chart: falcosidekick-0.7.8
     app.kubernetes.io/instance: falcosidekick
+    app.kubernetes.io/version: "2.28.0"
+    app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: core
 spec:
   type: ClusterIP
   ports:
@@ -19,8 +22,8 @@ spec:
       targetPort: http-notls
       protocol: TCP
       name: http-notls
-
   selector:
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
+    app.kubernetes.io/component: core
 ---
