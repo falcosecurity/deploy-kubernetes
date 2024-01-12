@@ -12,7 +12,9 @@ The default configuration in Falco utilizes the kernel module driver (`kmod`). T
 
 For additional guidance on using Falco in Kubernetes or benchmarking within a testbed, consider exploring the repository at https://github.com/falcosecurity/cncf-green-review-testing. Please note that the repository primarily focuses on testbed benchmarking, and as a result, the setup might not be best for real-world use.
 
-__NOTE__: If you're working with [minikube](https://minikube.sigs.k8s.io/docs/start/) locally, bear in mind that specific mount setups might be necessary. For instance, running `minikube start --mount --mount-string="/usr/src:/usr/src" --driver=docker` ensures that the `driver-loader` can access `/usr/src/kernels/` if the kernel driver (`kmod` or `ebpf`) is built on-the-fly. Running Falco with `--modern-bpf` does not require building a driver because it is already bundled within the userspace binary. This capability is enabled by the newer CORE (Compile Once - Run Everywhere) BPF feature and works only on more recent kernels (>= 5.8).
+__NOTE__: Running Falco with the `modern_ebpf` driver does not require downloading or building a driver because it is already bundled within the userspace binary. This capability is enabled by the newer CORE (Compile Once - Run Everywhere) BPF feature and works only on more recent kernels (>= 5.8). As a result you, don't need the `falco-driver-loader` init container for Falco with `modern_ebpf`.
+
+__NOTE__: Please refer to our [documentation]( https://falco.org/docs/install-operate/third-party/learning/#minikube) to learn more about localhost testing limitations.
 
 ### What's Included in the `falco` Deployment?
 
@@ -25,7 +27,7 @@ __NOTE__: If you're working with [minikube](https://minikube.sigs.k8s.io/docs/st
 - `falco`: Executes the Falco binary.
 - `falcoctl-artifact-follow`: Utilizes falcoctl's functionality to watch for updated rules.
 
-The template daemonset setup does not handle the method of extracting Falco logs from the container to their final destination (such as a data lake or SIEM). You can explore using tools like `falco-exporter`, `falcosidekick`, or create custom solutions.
+The template daemonset setup does not handle the method of extracting Falco logs from the container to their final destination (such as a data lake or SIEM).
 
 ### Deploy to Kubernetes
 
