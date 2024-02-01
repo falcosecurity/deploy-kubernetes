@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.8.7
+    helm.sh/chart: falco-4.0.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.36.2"
+    app.kubernetes.io/version: "0.37.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,11 +21,10 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: e317b53c704b3bc2e1d46240908fdcfb7ae53b62f09f557c31e18e26c7c27851
+        checksum/config: a0aca287f5dcadb07d2f17e65fa3ec65d278b13f686f5ee7d89bee1b91e31421
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
-      serviceAccountName: falco
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
@@ -33,7 +32,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco-no-driver:0.36.2
+          image: docker.io/falcosecurity/falco-no-driver:0.37.0
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -50,12 +49,6 @@ spec:
             - /run/containerd/containerd.sock
             - --cri
             - /run/crio/crio.sock
-            - -K
-            - /var/run/secrets/kubernetes.io/serviceaccount/token
-            - -k
-            - https://$(KUBERNETES_SERVICE_HOST)
-            - --k8s-node
-            - "$(FALCO_K8S_NODE_NAME)"
             - -pk
           env:
             - name: FALCO_K8S_NODE_NAME
@@ -80,10 +73,15 @@ spec:
           volumeMounts:
             - mountPath: /etc/falco
               name: rulesfiles-install-dir
+            - mountPath: /usr/share/falco/plugins
+              name: plugins-install-dir
             - mountPath: /root/.falco
               name: root-falco-fs
             - mountPath: /host/proc
               name: proc-fs
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
             - mountPath: /host/dev
               name: dev-fs
               readOnly: true
@@ -100,12 +98,12 @@ spec:
               subPath: falco.yaml
             
         - name: falcoctl-artifact-follow
-          image: docker.io/falcosecurity/falcoctl:0.6.2
+          image: docker.io/falcosecurity/falcoctl:0.7.1
           imagePullPolicy: IfNotPresent
           args:
             - artifact
             - follow
-            - --verbose
+            - --log-format=json
           securityContext:
           volumeMounts:
             - mountPath: /plugins
@@ -117,8 +115,9 @@ spec:
           env:
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.36.2
+          image: docker.io/falcosecurity/falco-driver-loader:0.37.0
           imagePullPolicy: IfNotPresent
+          args:
           securityContext:
             privileged: true
           volumeMounts:
@@ -140,12 +139,12 @@ spec:
               readOnly: true
           env:
         - name: falcoctl-artifact-install
-          image: docker.io/falcosecurity/falcoctl:0.6.2
+          image: docker.io/falcosecurity/falcoctl:0.7.1
           imagePullPolicy: IfNotPresent
           args: 
             - artifact
             - install
-            - --verbose
+            - --log-format=json
           securityContext:
           volumeMounts:
             - mountPath: /plugins

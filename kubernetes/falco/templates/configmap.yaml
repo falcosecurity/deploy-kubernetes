@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-3.8.7
+    helm.sh/chart: falco-4.0.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.36.2"
+    app.kubernetes.io/version: "0.37.0"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
@@ -15,6 +15,11 @@ data:
       custom_set: []
       repair: false
     buffered_outputs: false
+    engine:
+      kind: kmod
+      kmod:
+        buf_size_preset: 4
+        drop_failed_exit: false
     file_output:
       enabled: false
       filename: ./events.txt
@@ -31,9 +36,11 @@ data:
       ca_path: /etc/falco/certs/
       client_cert: /etc/falco/certs/client/client.crt
       client_key: /etc/falco/certs/client/client.key
+      compress_uploads: false
       echo: false
       enabled: false
       insecure: false
+      keep_alive: false
       mtls: false
       url: ""
       user_agent: falcosecurity/falco
@@ -47,10 +54,6 @@ data:
     log_level: info
     log_stderr: true
     log_syslog: true
-    metadata_download:
-      chunk_wait_us: 1000
-      max_mb: 100
-      watch_freq_sec: 1
     metrics:
       convert_memory_to_mb: true
       enabled: false
@@ -60,8 +63,7 @@ data:
       libbpf_stats_enabled: true
       output_rule: true
       resource_utilization_enabled: true
-    modern_bpf:
-      cpus_for_each_syscall_buffer: 2
+      state_counters_enabled: true
     output_timeout: 2000
     outputs:
       max_burst: 1000
@@ -90,8 +92,6 @@ data:
     - /etc/falco/rules.d
     stdout_output:
       enabled: true
-    syscall_buf_size_preset: 4
-    syscall_drop_failed_exit: false
     syscall_event_drops:
       actions:
       - log
