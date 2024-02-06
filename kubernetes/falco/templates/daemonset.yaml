@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.0.0
+    helm.sh/chart: falco-4.1.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.37.0"
@@ -21,10 +21,11 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: a0aca287f5dcadb07d2f17e65fa3ec65d278b13f686f5ee7d89bee1b91e31421
+        checksum/config: c99422e101d2942227cf084f38a1e378788afae0401ff2710aad023ca3fa1854
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
+      serviceAccountName: default
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
