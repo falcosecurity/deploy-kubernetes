@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/instance: falco-exporter
     app.kubernetes.io/version: "0.8.3"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: falco-exporter-0.9.8
+    helm.sh/chart: falco-exporter-0.9.9
   namespace: default
 spec:
   selector:
@@ -74,3 +74,5 @@ spec:
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
