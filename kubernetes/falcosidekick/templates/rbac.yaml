@@ -11,7 +11,6 @@ metadata:
     app.kubernetes.io/version: "2.28.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: core
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -26,7 +25,6 @@ metadata:
     app.kubernetes.io/version: "2.28.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: core
 rules:
 - apiGroups:
     - ""
@@ -48,7 +46,6 @@ metadata:
     app.kubernetes.io/version: "2.28.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: core
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
