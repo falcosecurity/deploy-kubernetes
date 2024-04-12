@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.2.5
+    helm.sh/chart: falco-4.3.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.37.1"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: c7580c3802ee5537b2aa31e3e4dde1d9afecb4ea70f9c86c3952a7d44cd59cf0
+        checksum/config: 10525f922d38b4b2e56252a526f394388e8f55a6dbcb05dcf1728f97afb35c95
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -52,6 +52,12 @@ spec:
             - /run/crio/crio.sock
             - -pk
           env:
+            - name: HOST_ROOT
+              value: /host
+            - name: FALCO_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: FALCO_K8S_NODE_NAME
               valueFrom:
                 fieldRef:
@@ -139,6 +145,8 @@ spec:
               name: etc-fs
               readOnly: true
           env:
+            - name: HOST_ROOT
+              value: /host
         - name: falcoctl-artifact-install
           image: docker.io/falcosecurity/falcoctl:0.7.2
           imagePullPolicy: IfNotPresent
