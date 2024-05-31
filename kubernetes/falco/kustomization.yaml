@@ -6,4 +6,6 @@ resources:
 - templates/configmap.yaml
 - templates/daemonset.yaml
 - templates/falcoctl-configmap.yaml
+- templates/role.yaml
+- templates/roleBinding.yaml
 - templates/serviceaccount.yaml
