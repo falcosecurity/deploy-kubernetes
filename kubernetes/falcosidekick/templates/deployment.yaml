@@ -4,13 +4,14 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.7.22
+    helm.sh/chart: falcosidekick-0.8.1
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
-    app.kubernetes.io/version: "2.28.0"
+    app.kubernetes.io/version: "2.29.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: core
+  annotations:
 spec:
   replicas: 2
   selector:
@@ -21,15 +22,15 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: falcosidekick-0.7.22
+        helm.sh/chart: falcosidekick-0.8.1
         app.kubernetes.io/name: falcosidekick
         app.kubernetes.io/instance: falcosidekick
-        app.kubernetes.io/version: "2.28.0"
+        app.kubernetes.io/version: "2.29.0"
         app.kubernetes.io/part-of: falcosidekick
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: core
       annotations:
-        checksum/config: 8ef791b68a251eea9a17e92521868eefb5e2316ffa7d6f760ef3f77818ebca3c
+        checksum/config: c5a3ddc3255c8b9ca943ac14a63557c80574622c3ee650b374636092a1bf3fae
     spec:
       serviceAccountName: falcosidekick
       securityContext:
@@ -37,7 +38,7 @@ spec:
         runAsUser: 1234
       containers:
         - name: falcosidekick
-          image: "docker.io/falcosecurity/falcosidekick:2.28.0"
+          image: "docker.io/falcosecurity/falcosidekick:2.29.0"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -65,6 +66,8 @@ spec:
               value: ""
             - name: TEMPLATEDFIELDS
               value: ""
+            - name: OUTPUTFIELDFORMAT
+              value: ""
             - name: BRACKETREPLACER
               value: ""
             - name: MUTUALTLSFILESPATH
@@ -75,5 +78,7 @@ spec:
               value: ""
             - name: MUTUALTLSCLIENT_CACERTFILE
               value: ""
+            - name: TLSCLIENT_CACERTFILE
+              value: "/etc/certs/client/ca.crt"
           resources:
             {}

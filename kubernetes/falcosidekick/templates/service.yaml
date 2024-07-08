@@ -4,13 +4,15 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.7.22
+    helm.sh/chart: falcosidekick-0.8.1
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
-    app.kubernetes.io/version: "2.28.0"
+    app.kubernetes.io/version: "2.29.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: core
+  annotations:
+    prometheus.io/scrape: "true"
 spec:
   type: ClusterIP
   ports:
