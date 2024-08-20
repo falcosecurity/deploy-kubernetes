@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.7.0
+    helm.sh/chart: falco-4.8.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.38.1"
+    app.kubernetes.io/version: "0.38.2"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
@@ -99,7 +99,7 @@ data:
       keep_alive: false
       program: 'jq ''{text: .output}'' | curl -d @- -X POST https://hooks.slack.com/services/XXX'
     rule_matching: first
-    rules_file:
+    rules_files:
     - /etc/falco/falco_rules.yaml
     - /etc/falco/falco_rules.local.yaml
     - /etc/falco/rules.d
