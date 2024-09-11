@@ -4,7 +4,7 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.8.4
+    helm.sh/chart: falcosidekick-0.8.5
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
     app.kubernetes.io/version: "2.29.0"
@@ -22,7 +22,7 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: falcosidekick-0.8.4
+        helm.sh/chart: falcosidekick-0.8.5
         app.kubernetes.io/name: falcosidekick
         app.kubernetes.io/instance: falcosidekick
         app.kubernetes.io/version: "2.29.0"
@@ -30,7 +30,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: core
       annotations:
-        checksum/config: 4da5ac77d5433f672032edbe9094af92a6aae84d6861570f39a59a70eea354fe
+        checksum/config: cc9a2f5a1ddbd477b7b99cf03507443b09234864511b1c3cbc9ce40441b6d326
     spec:
       serviceAccountName: falcosidekick
       securityContext:
@@ -79,6 +79,6 @@ spec:
             - name: MUTUALTLSCLIENT_CACERTFILE
               value: ""
             - name: TLSCLIENT_CACERTFILE
-              value: "/etc/certs/client/ca.crt"
+              value: ""
           resources:
             {}
