@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.8.1
+    helm.sh/chart: falco-4.8.2
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.38.2"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 54dad92345c3c4d6c8d81223af2117bbf59fafc0110299ea3f4964e3f5669c56
+        checksum/config: e44def2bd178d6b01b99ec4c6b4d4df6002b3cd488b3c406c7737b69bac40d5a
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -91,6 +91,11 @@ spec:
             - mountPath: /host/etc
               name: etc-fs
               readOnly: true
+            - mountPath: /host/dev
+              name: dev-fs
+              readOnly: true
+            - name: sys-fs
+              mountPath: /sys/module
             - mountPath: /host/var/run/
               name: docker-socket
             - mountPath: /host/run/containerd/
@@ -184,6 +189,12 @@ spec:
         - name: etc-fs
           hostPath:
             path: /etc
+        - name: dev-fs
+          hostPath:
+            path: /dev
+        - name: sys-fs
+          hostPath:
+            path: /sys/module
         - name: docker-socket
           hostPath:
             path: /var/run
