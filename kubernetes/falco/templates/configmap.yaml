@@ -4,13 +4,14 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.8.3
+    helm.sh/chart: falco-4.9.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.38.2"
+    app.kubernetes.io/version: "0.39.0"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
+    append_output: []
     base_syscalls:
       custom_set: []
       repair: false
@@ -56,6 +57,7 @@ data:
       mtls: false
       url: ""
       user_agent: falcosecurity/falco
+    json_include_message_property: false
     json_include_output_property: true
     json_include_tags_property: true
     json_output: false
@@ -72,15 +74,13 @@ data:
       include_empty_values: false
       interval: 1h
       kernel_event_counters_enabled: true
+      kernel_event_counters_per_cpu_enabled: false
       libbpf_stats_enabled: true
       output_rule: true
       resource_utilization_enabled: true
       rules_counters_enabled: true
       state_counters_enabled: true
     output_timeout: 2000
-    outputs:
-      max_burst: 1000
-      rate: 0
     outputs_queue:
       capacity: 0
     plugins:
