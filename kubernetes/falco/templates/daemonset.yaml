@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.11.1
+    helm.sh/chart: falco-4.11.2
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.39.1"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: c3471864722d9340e5adaa299627d2cf59fd6718a46957f68d347064d98c80c4
+        checksum/config: 46aad3e2d1edc46154203efc097dc2f4ff116df6da56e41ce57d4aea68118ace
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -123,7 +123,6 @@ spec:
               name: rulesfiles-install-dir
             - mountPath: /etc/falcoctl
               name: falcoctl-config-volume
-          env:
       initContainers:
         - name: falco-driver-loader
           image: docker.io/falcosecurity/falco-driver-loader:0.39.1
@@ -175,7 +174,6 @@ spec:
               name: rulesfiles-install-dir
             - mountPath: /etc/falcoctl
               name: falcoctl-config-volume
-          env:
       volumes:
         - name: specialized-falco-configs
           emptyDir: {}
