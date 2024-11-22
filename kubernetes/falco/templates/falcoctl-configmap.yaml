@@ -4,10 +4,10 @@ metadata:
   name: falco-falcoctl
   namespace: default
   labels:
-    helm.sh/chart: falco-4.14.2
+    helm.sh/chart: falco-4.15.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.39.1"
+    app.kubernetes.io/version: "0.39.2"
     app.kubernetes.io/managed-by: Helm
 data:
   falcoctl.yaml: |-
