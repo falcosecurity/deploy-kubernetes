@@ -10,10 +10,10 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.8.9
+    helm.sh/chart: falcosidekick-0.9.1
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
-    app.kubernetes.io/version: "2.29.0"
+    app.kubernetes.io/version: "2.30.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: core
@@ -32,10 +32,10 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.8.9
+    helm.sh/chart: falcosidekick-0.9.1
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
-    app.kubernetes.io/version: "2.29.0"
+    app.kubernetes.io/version: "2.30.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: core

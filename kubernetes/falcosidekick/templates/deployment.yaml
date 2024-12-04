@@ -4,10 +4,10 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.8.9
+    helm.sh/chart: falcosidekick-0.9.1
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
-    app.kubernetes.io/version: "2.29.0"
+    app.kubernetes.io/version: "2.30.0"
     app.kubernetes.io/part-of: falcosidekick
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: core
@@ -22,15 +22,15 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: falcosidekick-0.8.9
+        helm.sh/chart: falcosidekick-0.9.1
         app.kubernetes.io/name: falcosidekick
         app.kubernetes.io/instance: falcosidekick
-        app.kubernetes.io/version: "2.29.0"
+        app.kubernetes.io/version: "2.30.0"
         app.kubernetes.io/part-of: falcosidekick
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: core
       annotations:
-        checksum/config: c979574724825c4ad76c6f3dbedaf79fcb8c157b9e0531839e9c36e2dba2f275
+        checksum/config: fef2b61c1421a273b259a92b5bff8f54d8947a64c3c99d6ea547a75b794d1a41
     spec:
       serviceAccountName: falcosidekick
       securityContext:
@@ -38,7 +38,7 @@ spec:
         runAsUser: 1234
       containers:
         - name: falcosidekick
-          image: "docker.io/falcosecurity/falcosidekick:2.29.0"
+          image: "docker.io/falcosecurity/falcosidekick:2.30.0"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
