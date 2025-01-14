@@ -4,7 +4,7 @@ metadata:
   name: falcosidekick-loki-dashboard-grafana
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.9.4
+    helm.sh/chart: falcosidekick-0.9.5
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
     app.kubernetes.io/version: "2.30.0"
