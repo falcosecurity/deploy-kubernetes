@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.17.0
+    helm.sh/chart: falco-4.17.2
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.39.2"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: aa66b6acfc55cdc2374c2dcd399b29115069b2ebcdebf29926882a7eae6ce7cd
+        checksum/config: 29334bbbf94ddd733f2e697748679fb9a342328d7d4389a7b8c476f669b3f09a
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -65,6 +65,10 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
           tty: false
+          ports:
+            - containerPort: 8765
+              name: web
+              protocol: TCP
           livenessProbe:
             initialDelaySeconds: 60
             timeoutSeconds: 5
