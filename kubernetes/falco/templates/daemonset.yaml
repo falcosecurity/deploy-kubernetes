@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.17.2
+    helm.sh/chart: falco-4.19.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.39.2"
+    app.kubernetes.io/version: "0.40.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 29334bbbf94ddd733f2e697748679fb9a342328d7d4389a7b8c476f669b3f09a
+        checksum/config: e189b0ac68f5bbe4cd900e613a2fbec68d8c4144f211a2a9369e6706a9e5d3ef
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -33,7 +33,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco-no-driver:0.39.2
+          image: docker.io/falcosecurity/falco:0.40.0-debian
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -46,12 +46,6 @@ spec:
             privileged: true
           args:
             - /usr/bin/falco        
-            - --cri
-            - /var/run/docker.sock
-            - --cri
-            - /run/containerd/containerd.sock
-            - --cri
-            - /run/crio/crio.sock
             - -pk
           env:
             - name: HOST_ROOT
@@ -129,7 +123,7 @@ spec:
               name: falcoctl-config-volume
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.39.2
+          image: docker.io/falcosecurity/falco-driver-loader:0.40.0
           imagePullPolicy: IfNotPresent
           args:
             - auto

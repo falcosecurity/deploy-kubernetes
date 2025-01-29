@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.17.2
+    helm.sh/chart: falco-4.19.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.39.2"
+    app.kubernetes.io/version: "0.40.0"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
@@ -18,6 +18,22 @@ data:
     buffered_outputs: false
     config_files:
     - /etc/falco/config.d
+    container_engines:
+      bpm:
+        enabled: false
+      cri:
+        enabled: true
+        sockets:
+        - /run/containerd/containerd.sock
+        - /run/crio/crio.sock
+      docker:
+        enabled: true
+      libvirt_lxc:
+        enabled: false
+      lxc:
+        enabled: false
+      podman:
+        enabled: false
     engine:
       ebpf:
         buf_size_preset: 4
