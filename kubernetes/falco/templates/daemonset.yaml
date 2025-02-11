@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.19.0
+    helm.sh/chart: falco-4.20.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.40.0"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: e189b0ac68f5bbe4cd900e613a2fbec68d8c4144f211a2a9369e6706a9e5d3ef
+        checksum/config: 9af2aad319d69dfc3a98eeee70bdde8701ed01ab0ac8cbccda6063c2884656f5
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -107,7 +107,7 @@ spec:
               subPath: falco.yaml
             
         - name: falcoctl-artifact-follow
-          image: docker.io/falcosecurity/falcoctl:0.10.1
+          image: docker.io/falcosecurity/falcoctl:0.11.0
           imagePullPolicy: IfNotPresent
           args:
             - artifact
@@ -158,7 +158,7 @@ spec:
             - name: FALCOCTL_DRIVER_CONFIG_CONFIGMAP
               value: falco
         - name: falcoctl-artifact-install
-          image: docker.io/falcosecurity/falcoctl:0.10.1
+          image: docker.io/falcosecurity/falcoctl:0.11.0
           imagePullPolicy: IfNotPresent
           args: 
             - artifact
