@@ -4,7 +4,7 @@ metadata:
   name: falcosidekick
   namespace: default
   labels:
-    helm.sh/chart: falcosidekick-0.9.10
+    helm.sh/chart: falcosidekick-0.9.11
     app.kubernetes.io/name: falcosidekick
     app.kubernetes.io/instance: falcosidekick
     app.kubernetes.io/version: "2.31.1"
@@ -22,7 +22,7 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: falcosidekick-0.9.10
+        helm.sh/chart: falcosidekick-0.9.11
         app.kubernetes.io/name: falcosidekick
         app.kubernetes.io/instance: falcosidekick
         app.kubernetes.io/version: "2.31.1"
@@ -30,7 +30,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/component: core
       annotations:
-        checksum/config: 1b077e5b0281bbde5b053a2d813fcf67244d6ddcad26180fd13373f222edfcb8
+        checksum/config: 7db296540c99f96533e4413610a4d937b11d02c36611eda8c9759470f6a01833
     spec:
       serviceAccountName: falcosidekick
       securityContext:
@@ -65,6 +65,8 @@ spec:
             - name: CUSTOMFIELDS
               value: ""
             - name: TEMPLATEDFIELDS
+              value: ""
+            - name: CUSTOMTAGS
               value: ""
             - name: OUTPUTFIELDFORMAT
               value: ""
