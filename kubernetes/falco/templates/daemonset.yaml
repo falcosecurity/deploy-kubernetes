@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.21.3
+    helm.sh/chart: falco-4.22.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/version: "0.41.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: cd6400615801b36f2924fd53eeae0f8b454592c805ceec52b18640b2c20a5791
+        checksum/config: 80fba30ae72c9c64d1f6142a2371a61a387e9888472cb73b80b5cc156444ddc7
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -33,7 +33,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco:0.40.0-debian
+          image: docker.io/falcosecurity/falco:0.41.0-debian
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -46,7 +46,6 @@ spec:
             privileged: true
           args:
             - /usr/bin/falco        
-            - -pk
           env:
             - name: HOST_ROOT
               value: /host
@@ -78,6 +77,12 @@ spec:
               path: /healthz
               port: 8765
           volumeMounts:
+            - mountPath: /host/var/run/docker.sock
+              name: docker-socket
+            - mountPath: /host/run/crio/crio.sock
+              name: crio-socket
+            - mountPath: /host/run/containerd/containerd.sock
+              name: containerd-socket
             - mountPath: /etc/falco
               name: rulesfiles-install-dir
             - mountPath: /usr/share/falco/plugins
@@ -96,12 +101,6 @@ spec:
               readOnly: true
             - name: sys-fs
               mountPath: /sys/module
-            - mountPath: /host/var/run
-              name: docker-socket
-            - mountPath: /host/run/containerd
-              name: containerd-socket
-            - mountPath: /host/run/crio
-              name: crio-socket
             - mountPath: /etc/falco/falco.yaml
               name: falco-yaml
               subPath: falco.yaml
@@ -123,7 +122,7 @@ spec:
               name: falcoctl-config-volume
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.40.0
+          image: docker.io/falcosecurity/falco-driver-loader:0.41.0
           imagePullPolicy: IfNotPresent
           args:
             - auto
@@ -173,6 +172,15 @@ spec:
             - mountPath: /etc/falcoctl
               name: falcoctl-config-volume
       volumes:
+        - hostPath:
+            path: /var/run/docker.sock
+          name: docker-socket
+        - hostPath:
+            path: /run/crio/crio.sock
+          name: crio-socket
+        - hostPath:
+            path: /run/containerd/containerd.sock
+          name: containerd-socket
         - name: specialized-falco-configs
           emptyDir: {}
         - name: plugins-install-dir
@@ -199,15 +207,7 @@ spec:
         - name: sys-fs
           hostPath:
             path: /sys/module
-        - name: docker-socket
-          hostPath:
-            path: /var/run
-        - name: containerd-socket
-          hostPath:
-            path: /run/containerd
-        - name: crio-socket
-          hostPath:
-            path: /run/crio
+    
         - name: proc-fs
           hostPath:
             path: /proc
