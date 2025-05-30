@@ -4,14 +4,15 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-4.21.3
+    helm.sh/chart: falco-4.22.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/version: "0.41.0"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
-    append_output: []
+    append_output:
+    - suggested_output: true
     base_syscalls:
       custom_set: []
       repair: false
@@ -22,12 +23,14 @@ data:
       bpm:
         enabled: false
       cri:
-        enabled: true
+        disable_async: false
+        enabled: false
         sockets:
         - /run/containerd/containerd.sock
         - /run/crio/crio.sock
+        - /run/k3s/containerd/containerd.sock
       docker:
-        enabled: true
+        enabled: false
       libvirt_lxc:
         enabled: false
       lxc:
@@ -70,17 +73,20 @@ data:
       enabled: false
       insecure: false
       keep_alive: false
+      max_consecutive_timeouts: 5
       mtls: false
       url: ""
       user_agent: falcosecurity/falco
     json_include_message_property: false
+    json_include_output_fields_property: true
     json_include_output_property: true
     json_include_tags_property: true
     json_output: false
     libs_logger:
-      enabled: false
-      severity: debug
-    load_plugins: []
+      enabled: true
+      severity: info
+    load_plugins:
+    - container
     log_level: info
     log_stderr: true
     log_syslog: true
@@ -109,6 +115,36 @@ data:
     - init_config: ""
       library_path: libjson.so
       name: json
+    - init_config:
+        engines:
+          bpm:
+            enabled: false
+          containerd:
+            enabled: true
+            sockets:
+            - /run/containerd/containerd.sock
+          cri:
+            enabled: true
+            sockets:
+            - /run/crio/crio.sock
+          docker:
+            enabled: true
+            sockets:
+            - /var/run/docker.sock
+          libvirt_lxc:
+            enabled: false
+          lxc:
+            enabled: false
+          podman:
+            enabled: false
+            sockets:
+            - /run/podman/podman.sock
+        hooks:
+        - create
+        label_max_len: 100
+        with_size: false
+      library_path: libcontainer.so
+      name: container
     priority: debug
     program_output:
       enabled: false
