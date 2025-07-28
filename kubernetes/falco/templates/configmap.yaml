@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-6.1.0
+    helm.sh/chart: falco-6.2.1
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.41.3"
@@ -118,25 +118,28 @@ data:
     - init_config:
         engines:
           bpm:
-            enabled: false
+            enabled: true
           containerd:
             enabled: true
             sockets:
-            - /run/containerd/containerd.sock
+            - /run/host-containerd/containerd.sock
           cri:
             enabled: true
             sockets:
+            - /run/containerd/containerd.sock
             - /run/crio/crio.sock
+            - /run/k3s/containerd/containerd.sock
+            - /run/host-containerd/containerd.sock
           docker:
             enabled: true
             sockets:
             - /var/run/docker.sock
           libvirt_lxc:
-            enabled: false
+            enabled: true
           lxc:
-            enabled: false
+            enabled: true
           podman:
-            enabled: false
+            enabled: true
             sockets:
             - /run/podman/podman.sock
         hooks:
