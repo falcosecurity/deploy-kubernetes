@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-6.1.0
+    helm.sh/chart: falco-6.2.1
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.41.3"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 707e9c5aed45895b6e054382a58286579a47db496d6ce3cc2145af1fe2f3227a
+        checksum/config: 948adb2235f9c452256f8a116e5000835b63646b5f8a15ca4c138f50a15698f8
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -78,11 +78,17 @@ spec:
               port: 8765
           volumeMounts:
             - mountPath: /host/var/run/docker.sock
-              name: docker-socket
-            - mountPath: /host/run/crio/crio.sock
-              name: crio-socket
+              name: container-engine-socket-0
+            - mountPath: /host/run/podman/podman.sock
+              name: container-engine-socket-1
+            - mountPath: /host/run/host-containerd/containerd.sock
+              name: container-engine-socket-2
             - mountPath: /host/run/containerd/containerd.sock
-              name: containerd-socket
+              name: container-engine-socket-3
+            - mountPath: /host/run/crio/crio.sock
+              name: container-engine-socket-4
+            - mountPath: /host/run/k3s/containerd/containerd.sock
+              name: container-engine-socket-5
             - mountPath: /etc/falco
               name: rulesfiles-install-dir
             - mountPath: /usr/share/falco/plugins
@@ -174,13 +180,22 @@ spec:
       volumes:
         - hostPath:
             path: /var/run/docker.sock
-          name: docker-socket
+          name: container-engine-socket-0
         - hostPath:
-            path: /run/crio/crio.sock
-          name: crio-socket
+            path: /run/podman/podman.sock
+          name: container-engine-socket-1
+        - hostPath:
+            path: /run/host-containerd/containerd.sock
+          name: container-engine-socket-2
         - hostPath:
             path: /run/containerd/containerd.sock
-          name: containerd-socket
+          name: container-engine-socket-3
+        - hostPath:
+            path: /run/crio/crio.sock
+          name: container-engine-socket-4
+        - hostPath:
+            path: /run/k3s/containerd/containerd.sock
+          name: container-engine-socket-5
         - name: specialized-falco-configs
           emptyDir: {}
         - name: plugins-install-dir
