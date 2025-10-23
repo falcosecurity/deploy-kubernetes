@@ -4,39 +4,28 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-6.4.0
+    helm.sh/chart: falco-7.0.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.41.3"
+    app.kubernetes.io/version: "0.42.0"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
     append_output:
     - suggested_output: true
     base_syscalls:
+      all: false
       custom_set: []
       repair: false
+    buffer_format_base64: false
     buffered_outputs: false
+    capture:
+      default_duration: 5000
+      enabled: false
+      mode: rules
+      path_prefix: /tmp/falco
     config_files:
     - /etc/falco/config.d
-    container_engines:
-      bpm:
-        enabled: false
-      cri:
-        disable_async: false
-        enabled: false
-        sockets:
-        - /run/containerd/containerd.sock
-        - /run/crio/crio.sock
-        - /run/k3s/containerd/containerd.sock
-      docker:
-        enabled: false
-      libvirt_lxc:
-        enabled: false
-      lxc:
-        enabled: false
-      podman:
-        enabled: false
     engine:
       ebpf:
         buf_size_preset: 4
@@ -51,6 +40,9 @@ data:
         cpus_for_each_buffer: 2
         drop_failed_exit: false
     falco_libs:
+      snaplen: 80
+      thread_table_auto_purging_interval_s: 300
+      thread_table_auto_purging_thread_timeout_s: 300
       thread_table_size: 262144
     file_output:
       enabled: false
@@ -90,31 +82,10 @@ data:
     log_level: info
     log_stderr: true
     log_syslog: true
-    metrics:
-      convert_memory_to_mb: true
-      enabled: false
-      include_empty_values: false
-      interval: 1h
-      kernel_event_counters_enabled: true
-      kernel_event_counters_per_cpu_enabled: false
-      libbpf_stats_enabled: true
-      output_rule: true
-      resource_utilization_enabled: true
-      rules_counters_enabled: true
-      state_counters_enabled: true
     output_timeout: 2000
     outputs_queue:
       capacity: 0
     plugins:
-    - init_config: null
-      library_path: libk8saudit.so
-      name: k8saudit
-      open_params: http://:9765/k8s-audit
-    - library_path: libcloudtrail.so
-      name: cloudtrail
-    - init_config: ""
-      library_path: libjson.so
-      name: json
     - init_config:
         engines:
           bpm:
@@ -148,6 +119,7 @@ data:
         with_size: false
       library_path: libcontainer.so
       name: container
+    plugins_hostinfo: true
     priority: debug
     program_output:
       enabled: false
@@ -177,6 +149,7 @@ data:
     webserver:
       enabled: true
       k8s_healthz_endpoint: /healthz
+      listen_address: 0.0.0.0
       listen_port: 8765
       prometheus_metrics_enabled: false
       ssl_certificate: /etc/falco/falco.pem
