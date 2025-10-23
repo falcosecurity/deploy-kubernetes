@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-6.4.0
+    helm.sh/chart: falco-7.0.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.41.3"
+    app.kubernetes.io/version: "0.42.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: e35c8774ae88ec5f110f6b062ff28e294f6db6f4602a38ef210e358eedab1473
+        checksum/config: 1c9450a1b863abab860ccb985e13b386ba7be849999baa91ca21ed75506b05b7
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -33,7 +33,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco:0.41.3
+          image: docker.io/falcosecurity/falco:0.42.0
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -105,14 +105,17 @@ spec:
             - mountPath: /host/dev
               name: dev-fs
               readOnly: true
-            - name: sys-fs
+            - name: sys-module-fs
               mountPath: /sys/module
+            - mountPath: /sys/kernel
+              name: sys-fs
+              readOnly: true
             - mountPath: /etc/falco/falco.yaml
               name: falco-yaml
               subPath: falco.yaml
             
         - name: falcoctl-artifact-follow
-          image: docker.io/falcosecurity/falcoctl:0.11.2
+          image: docker.io/falcosecurity/falcoctl:0.11.4
           imagePullPolicy: IfNotPresent
           args:
             - artifact
@@ -128,7 +131,7 @@ spec:
               name: falcoctl-config-volume
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.41.3
+          image: docker.io/falcosecurity/falco-driver-loader:0.42.0
           imagePullPolicy: IfNotPresent
           args:
             - auto
@@ -163,9 +166,9 @@ spec:
             - name: FALCOCTL_DRIVER_CONFIG_CONFIGMAP
               value: falco
         - name: falcoctl-artifact-install
-          image: docker.io/falcosecurity/falcoctl:0.11.2
+          image: docker.io/falcosecurity/falcoctl:0.11.4
           imagePullPolicy: IfNotPresent
-          args: 
+          args:
             - artifact
             - install
             - --log-format=json
@@ -219,9 +222,12 @@ spec:
         - name: dev-fs
           hostPath:
             path: /dev
-        - name: sys-fs
+        - name: sys-module-fs
           hostPath:
             path: /sys/module
+        - name: sys-fs
+          hostPath:
+            path: /sys/kernel
         - name: proc-fs
           hostPath:
             path: /proc
