@@ -4,7 +4,7 @@ metadata:
   name: falco-falcoctl
   namespace: default
   labels:
-    helm.sh/chart: falco-7.0.1
+    helm.sh/chart: falco-7.0.2
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.42.1"
@@ -16,7 +16,7 @@ data:
       - rulesfile
       - plugin
       follow:
-        every: 6h
+        every: 168h
         falcoversions: http://localhost:8765/versions
         pluginsDir: /plugins
         refs:
