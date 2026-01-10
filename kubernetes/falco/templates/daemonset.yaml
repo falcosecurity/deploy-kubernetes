@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-7.0.2
+    helm.sh/chart: falco-7.0.5
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.42.1"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: e66ac9950418f69e96db419f58e25ed3f973256a401d7f54ef87a824248814b3
+        checksum/config: cf5f1e62a146c31ce0bc8dcef4c2be668054c72037ca7fc7117aeb5c8bcf317f
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -62,17 +62,27 @@ spec:
             - containerPort: 8765
               name: web
               protocol: TCP
+          startupProbe:
+            initialDelaySeconds: 3
+            timeoutSeconds: 5
+            periodSeconds: 5
+            failureThreshold: 20
+            httpGet:
+              path: /healthz
+              port: 8765
           livenessProbe:
-            initialDelaySeconds: 60
+            initialDelaySeconds: 0
             timeoutSeconds: 5
             periodSeconds: 15
+            failureThreshold: 3
             httpGet:
               path: /healthz
               port: 8765
           readinessProbe:
-            initialDelaySeconds: 30
+            initialDelaySeconds: 0
             timeoutSeconds: 5
             periodSeconds: 15
+            failureThreshold: 3
             httpGet:
               path: /healthz
               port: 8765
