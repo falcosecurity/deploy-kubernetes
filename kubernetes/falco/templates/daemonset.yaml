@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-7.0.5
+    helm.sh/chart: falco-7.1.1
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.42.1"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: cf5f1e62a146c31ce0bc8dcef4c2be668054c72037ca7fc7117aeb5c8bcf317f
+        checksum/config: 53add496829c8cc3d9f14f80ea1f8d9d6bc17d8327bf598cab5e87a3b22e8d04
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
