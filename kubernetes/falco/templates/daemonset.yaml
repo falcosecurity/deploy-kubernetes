@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-7.1.1
+    helm.sh/chart: falco-7.2.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
     app.kubernetes.io/version: "0.42.1"
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 53add496829c8cc3d9f14f80ea1f8d9d6bc17d8327bf598cab5e87a3b22e8d04
+        checksum/config: 764a17f79dc4de95bb0dfd8d42ddc460f3d0a9e8d2b68dbec0b171306e6d7f5c
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -125,7 +125,7 @@ spec:
               subPath: falco.yaml
             
         - name: falcoctl-artifact-follow
-          image: docker.io/falcosecurity/falcoctl:0.11.4
+          image: docker.io/falcosecurity/falcoctl:0.12.0
           imagePullPolicy: IfNotPresent
           args:
             - artifact
@@ -139,6 +139,8 @@ spec:
               name: rulesfiles-install-dir
             - mountPath: /etc/falcoctl
               name: falcoctl-config-volume
+            - mountPath: /artifactstate
+              name: artifact-state-dir
       initContainers:
         - name: falco-driver-loader
           image: docker.io/falcosecurity/falco-driver-loader:0.42.1
@@ -176,7 +178,7 @@ spec:
             - name: FALCOCTL_DRIVER_CONFIG_CONFIGMAP
               value: falco
         - name: falcoctl-artifact-install
-          image: docker.io/falcosecurity/falcoctl:0.11.4
+          image: docker.io/falcosecurity/falcoctl:0.12.0
           imagePullPolicy: IfNotPresent
           args:
             - artifact
@@ -190,6 +192,8 @@ spec:
               name: rulesfiles-install-dir
             - mountPath: /etc/falcoctl
               name: falcoctl-config-volume
+            - mountPath: /artifactstate
+              name: artifact-state-dir
       volumes:
         - hostPath:
             path: /var/run/docker.sock
@@ -214,6 +218,8 @@ spec:
         - name: plugins-install-dir
           emptyDir: {}
         - name: rulesfiles-install-dir
+          emptyDir: {}
+        - name: artifact-state-dir
           emptyDir: {}
         - name: root-falco-fs
           emptyDir: {}  
