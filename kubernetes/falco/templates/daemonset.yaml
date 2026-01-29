@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-7.2.1
+    helm.sh/chart: falco-8.0.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.42.1"
+    app.kubernetes.io/version: "0.43.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: falco
         app.kubernetes.io/instance: falco
       annotations:
-        checksum/config: 9506c2b63ea641bd41f7d85b589b072424d5839767c0595fe4b3f66d0b3b336d
+        checksum/config: 86ae366e9c22cfe203043647ba2652cdf60f7dfe71fa551480fbc1657b05cf11
         checksum/rules: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     spec:
@@ -33,7 +33,7 @@ spec:
           key: node-role.kubernetes.io/control-plane
       containers:
         - name: falco
-          image: docker.io/falcosecurity/falco:0.42.1
+          image: docker.io/falcosecurity/falco:0.43.0
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -125,7 +125,7 @@ spec:
               subPath: falco.yaml
             
         - name: falcoctl-artifact-follow
-          image: docker.io/falcosecurity/falcoctl:0.12.1
+          image: docker.io/falcosecurity/falcoctl:0.12.2
           imagePullPolicy: IfNotPresent
           args:
             - artifact
@@ -143,7 +143,7 @@ spec:
               name: artifact-state-dir
       initContainers:
         - name: falco-driver-loader
-          image: docker.io/falcosecurity/falco-driver-loader:0.42.1
+          image: docker.io/falcosecurity/falco-driver-loader:0.43.0
           imagePullPolicy: IfNotPresent
           args:
             - auto
@@ -178,7 +178,7 @@ spec:
             - name: FALCOCTL_DRIVER_CONFIG_CONFIGMAP
               value: falco
         - name: falcoctl-artifact-install
-          image: docker.io/falcosecurity/falcoctl:0.12.1
+          image: docker.io/falcosecurity/falcoctl:0.12.2
           imagePullPolicy: IfNotPresent
           args:
             - artifact
