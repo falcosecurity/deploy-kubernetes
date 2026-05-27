@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-8.0.5
+    helm.sh/chart: falco-9.0.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.43.1"
+    app.kubernetes.io/version: "0.44.0"
     app.kubernetes.io/managed-by: Helm
 subjects:
   - kind: ServiceAccount
