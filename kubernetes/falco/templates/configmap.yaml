@@ -4,10 +4,10 @@ metadata:
   name: falco
   namespace: default
   labels:
-    helm.sh/chart: falco-9.0.0
+    helm.sh/chart: falco-9.1.0
     app.kubernetes.io/name: falco
     app.kubernetes.io/instance: falco
-    app.kubernetes.io/version: "0.44.0"
+    app.kubernetes.io/version: "0.44.1"
     app.kubernetes.io/managed-by: Helm
 data:
   falco.yaml: |-
@@ -34,6 +34,7 @@ data:
       modern_ebpf:
         buf_size_preset: 4
         cpus_for_each_buffer: 2
+        disable_iterators: false
         drop_failed_exit: false
     falco_libs:
       snaplen: 80
